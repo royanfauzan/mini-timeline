@@ -34,7 +34,7 @@ const Post = require('./models/Post');
 // Route & Controller
 
 app.get('/', (req, res) => {
-    res.render('index');
+    res.redirect('/login')
 });
 
 app.get('/data', (req, res) => {
@@ -120,8 +120,26 @@ app.post('/register',
     });
 
 app.get('/home', mdwLoggedinPage, async (req, res) => {
-    const listPosts = await Post.find().populate('owner', 'name username').populate('likes', 'name username')
+    const listPosts = await Post.find().populate('owner', 'name username').sort({_id:'desc'})
     res.render('home', {
+        listPosts: listPosts,
+        user_id: req.currUser.user_id
+    });
+});
+
+app.get('/mypost', mdwLoggedinPage, async (req, res) => {
+    const listPosts = await Post.find({ owner: req.currUser.user_id }).populate('owner', 'name username').sort({_id:'desc'})
+    res.render('mypost', {
+        listPosts: listPosts,
+        user_id: req.currUser.user_id
+    });
+});
+
+app.get('/liked', mdwLoggedinPage, async (req, res) => {
+    const listPosts = await Post.find({ likes: req.currUser.user_id }).populate('owner', 'name username').sort({_id:'desc'})
+    console.log(mongoose.Types.ObjectId(req.currUser.user_id))
+    console.log(listPosts)
+    res.render('likedpost', {
         listPosts: listPosts,
         user_id: req.currUser.user_id
     });
@@ -220,10 +238,13 @@ app.post('/post/addlikes/:id', mdwLoggedinApi,
         }
 
         try {
+            if(post.likes.includes(req.currUser.user_id)){
+                return res.status(200).json({ message: { post: post }, errors: errors });
+            }
             post.likes.push(req.currUser.user_id);
             post.save();
-            return res.status(200).json({ message: { email: req.body.textpost }, errors: errors });
-            
+            return res.status(200).json({ message: { post: post }, errors: errors });
+
         } catch (error) {
             let erz = errors.array();
             erz.push({ msg: `${error} `, param: 'alert' });
@@ -231,7 +252,7 @@ app.post('/post/addlikes/:id', mdwLoggedinApi,
         }
     });
 
-    app.post('/post/removelikes/:id', mdwLoggedinApi,
+app.post('/post/removelikes/:id', mdwLoggedinApi,
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -249,8 +270,8 @@ app.post('/post/addlikes/:id', mdwLoggedinApi,
         try {
             post.likes.pull(req.currUser.user_id);
             post.save();
-            return res.status(200).json({ message: { email: req.body.textpost }, errors: errors });
-            
+            return res.status(200).json({ message: { post: post}, errors: errors });
+
         } catch (error) {
             let erz = errors.array();
             erz.push({ msg: `${error} `, param: 'alert' });
@@ -276,7 +297,8 @@ app.delete('/post/delete/:id', mdwLoggedinApi,
         try {
             if (req.currUser.user_id == post.owner) {
                 Post.findByIdAndDelete(req.params.id, (err, post) => {
-                    return res.status(200).json({ message: { delete: post }, errors: err });
+                    if(err) {return res.status(200).json({ message: { delete: post }, errors: [{ msg: `${err} `, param: 'alert' }] });}
+                    return res.status(200).json({ message: { delete: post }, errors: [] });
                 })
 
             } else {

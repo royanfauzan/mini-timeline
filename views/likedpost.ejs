@@ -15,9 +15,9 @@
 <body>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col col-md-4 ">
+            <div class="col col-md-4">
                 <div class="row mt-4 sticky-top bg-white">
-                    <div class="col border-bottom border-primary">
+                    <div class="col ">
                         <a class="btn btn-outline-primary border-0" href="/home">
                             <p class="text-center">Home</p>
                         </a>
@@ -27,19 +27,20 @@
                             <p class="text-center">My Post</p>
                         </a>
                     </div>
-                    <div class="col">
+                    <div class="col border-bottom border-primary">
                         <a class="btn btn-outline-primary border-0" href="/liked">
                             <p class="text-center">Liked</p>
                         </a>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" id="parentdiv">
                     <% if (listPosts.length<=0) { %>
                         <p>No Post yet..</p>
                         <% } %>
                             <% listPosts.forEach(post=> {
                                 %>
-                                <div class="col-12 d-flex align-items-start mt-3 pb-2 shadow-sm p-3 mb-5 bg-body rounded">
+                                <div class="col-12 d-flex align-items-start mt-3 pb-2 shadow-sm p-3 mb-5 bg-body rounded"
+                                    id="elm<%= post._id %>">
                                     <div>
                                         <h3 class="fs-4">
                                             <%= post.owner.name %>
@@ -52,15 +53,15 @@
 
                                             <% if (post.likes.includes(user_id)) { %>
                                                 <input type="hidden" id="status" value="liked" />
-                                                <button type="submit" id="btn<%= post._id %>" class="btn btn-primary"><span
-                                                        class="fs-4 mx-3">♡</span>
-                                                    <span id="numberlike<%= post._id %>"><%= post.likes.length %></span>
+                                                <button type="submit" id="btn<%= post._id %>"
+                                                    class="btn btn-primary"><span class="fs-4 mx-3">♡</span>
+                                                    <%= post.likes.length %>
                                                 </button>
                                                 <% } else { %>
                                                     <input type="hidden" id="status" value="not" />
-                                                    <button type="submit" id="btn<%= post._id %>" class="btn btn-outline-primary"><span
-                                                            class="fs-4 mx-3">♡</span>
-                                                        <span id="numberlike<%= post._id %>"><%= post.likes.length %></span>
+                                                    <button type="submit" id="btn<%= post._id %>"
+                                                        class="btn btn-outline-primary"><span class="fs-4 mx-3">♡</span>
+                                                        <%= post.likes.length %>
                                                     </button>
                                                     <% } %>
                                         </form>
@@ -68,7 +69,7 @@
                                 </div>
 
                                 <% }); %>
-                                    
+
 
                 </div>
             </div>
@@ -112,16 +113,12 @@
                         // Object.keys(data.errors).length;
                         // window.location.href = '/';
                         const btnpost = document.getElementById(`btn${idpost}`);
-                        const likeCount = document.getElementById(`numberlike${idpost}`);
-                        let currCount = parseInt(likeCount.innerText);
-                        if (apiset == 'addlikes') {
-                            currCount++;
-                        }else{
-                            currCount--;
+                        document.getElementById(`elm${idpost}`).remove();
+                        const parentcontent = document.getElementById("parentdiv").childNodes.length;
+                        if (parentcontent.childNodes.length <= 0) {
+                            const node = document.createElement("li");
+                            const textnode = document.createTextNode("Water");
                         }
-                        likeCount.innerText = currCount;
-                        btnpost.classList.toggle(`btn-outline-primary`);
-                        btnpost.classList.toggle(`btn-primary`);
                     } else {
                         data.errors.map((err) => {
                             const invalidFeed = document.getElementById(`${err.param}Invalid`);
