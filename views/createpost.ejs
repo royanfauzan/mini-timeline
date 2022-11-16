@@ -7,45 +7,51 @@
     <title></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
 <body>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col col-md-4">
-                <div class="row mt-4 pt-4">
+                <div class="row mt-4 sticky-top bg-white">
                     <div class="col">
-                        <h2 class="text-center">Login</h2>
+                        <a class="btn btn-outline-primary border-0" href="/home">
+                            <p class="text-center">Home</p>
+                        </a>
+                    </div>
+                    <div class="col border-bottom border-primary">
+                        <a class="btn btn-outline-primary border-0" href="/mypost">
+                            <p class="text-center">My Post</p>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-outline-primary border-0" href="/liked">
+                            <p class="text-center">Liked</p>
+                        </a>
                     </div>
                 </div>
                 <div class="row">
-                    <form onsubmit="tryLogin(event)" id="formlogin">
+                    <form onsubmit="tryPost(event)" id="formlogin">
                         <div class="mb-3">
                             <div id="alertInvalid" class="alert alert-danger d-none" role="alert">
                                 -
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="username" class="form-control" id="username" aria-describedby="usernameHelp">
-                            <div id="usernameInvalid" class="form-text text-danger d-none">-
+                            <label for="textpost" class="form-label"><h3>Post</h3></label>
+                            <textarea type="text" class="form-control" id="textpost" aria-describedby="textpostHelp"></textarea>
+                            <div id="textpostInvalid" class="form-text text-danger d-none">-
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password">
-                            <div id="passwordInvalid" class="form-text text-danger d-none">-
-                            </div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" onchange="viewPassword(event)"
-                                id="exampleCheck1">
-                            <label class="form-check-label" for="exampleCheck1">See Password</label>
-                        </div>
+                        
                         <div class="row justify-content-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Post</button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -55,28 +61,19 @@
     integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
     crossorigin="anonymous"></script>
 <script>
-    function viewPassword(event) {
-        const inputPwd = document.getElementById("password");
-        if (event.target.checked) {
-            inputPwd?.setAttribute("type", "text");
-        } else {
-            inputPwd?.setAttribute("type", "password");
-        }
-    };
 
-    function tryLogin(e) {
+    function tryPost(e) {
         e.preventDefault();
-        console.log(e.target.username.value);
 
         clearError();
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const data = { username: username, password: password };
+        const textpost = document.getElementById('textpost').value;
+
+        const data = { textpost: textpost };
         console.log(data);
 
         try {
-            fetch('/login', {
+            fetch('/post/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

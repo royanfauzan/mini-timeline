@@ -7,45 +7,69 @@
     <title></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
 <body>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col col-md-4">
-                <div class="row mt-4 pt-4">
+                <div class="row mt-4 sticky-top bg-white">
+                    <div class="col border-bottom border-primary">
+                        <a href="/home">
+                            <p class="text-center">Home</p>
+                        </a>
+                    </div>
                     <div class="col">
-                        <h2 class="text-center">Login</h2>
+                        <a href="/mypost">
+                            <p class="text-center">My Post</p>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/liked">
+                            <p class="text-center">Liked</p>
+                        </a>
                     </div>
                 </div>
                 <div class="row">
-                    <form onsubmit="tryLogin(event)" id="formlogin">
-                        <div class="mb-3">
-                            <div id="alertInvalid" class="alert alert-danger d-none" role="alert">
-                                -
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="username" class="form-control" id="username" aria-describedby="usernameHelp">
-                            <div id="usernameInvalid" class="form-text text-danger d-none">-
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password">
-                            <div id="passwordInvalid" class="form-text text-danger d-none">-
-                            </div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" onchange="viewPassword(event)"
-                                id="exampleCheck1">
-                            <label class="form-check-label" for="exampleCheck1">See Password</label>
-                        </div>
-                        <div class="row justify-content-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </form>
+                    <% if (listPosts.length<=0) { %>
+                        <p>No Post yet..</p>
+                        <% } %>
+                            <% listPosts.forEach(post=> {
+                                %>
+                                <div class="col-12 d-flex align-items-start mt-3 pb-2 border-bottom border-secondary">
+                                    <div>
+                                        <h3 class="fs-4">
+                                            <%= post.owner.name %>
+                                        </h3>
+                                        <p>
+                                            <%= post.text %>
+                                        </p>
+                                        <form onsubmit="tryLogin(event)">
+                                            <input type="hidden" id="idpost" value="<%= post._id %>" />
+
+                                            <% if (post.likes.includes(user_id)) { %>
+                                                <input type="hidden" id="status" value="liked" />
+                                                <button type="submit" class="btn btn-primary"><span
+                                                        class="fs-4 mx-3">♡</span>
+                                                    <%= post.likes.length %>
+                                                </button>
+                                                <% } else { %>
+                                                    <input type="hidden" id="status" value="not" />
+                                                    <button type="submit" class="btn btn-outline-primary"><span
+                                                            class="fs-4 mx-3">♡</span>
+                                                        <%= post.likes.length %>
+                                                    </button>
+                                                    <% } %>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <% }); %>
+                                    
+
                 </div>
             </div>
         </div>
@@ -66,7 +90,6 @@
 
     function tryLogin(e) {
         e.preventDefault();
-        console.log(e.target.username.value);
 
         clearError();
 
@@ -89,7 +112,7 @@
                     console.log(data)
                     if (!data.errors.length) {
                         // Object.keys(data.errors).length;
-                        window.location.href = '/home';
+                        window.location.href = '/';
                     } else {
                         data.errors.map((err) => {
                             const invalidFeed = document.getElementById(`${err.param}Invalid`);
